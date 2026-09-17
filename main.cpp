@@ -29,7 +29,7 @@ struct house_detail
 
 int main()
 {
-    connection server_conn = open_connection("client1", "127.0.0.1", 49152);
+    connection server_conn = open_connection("client1", "127.0.0.1", 6000);
     open_window("My Interface!", 800, 600);
     if (!is_connection_open(server_conn))
     {
@@ -109,6 +109,7 @@ int main()
     int total_revenue = 100;
 
     bool is_entering_name = false;
+    int flag1 = 0;
     while (!quit_requested())
     {
         check_network_activity();
@@ -123,9 +124,10 @@ int main()
             {
                 current_price = to_integer(data);
             }
-            else
+            else if (data == "ITEM:0")
             {
-                // write_line("Ignored invalid message: " + data);
+                write_line("TRUE");
+                flag1 += 1;
             }
 
             close_message(message_log);
@@ -170,6 +172,9 @@ int main()
             if (button("Yes", rectangle_from(center_point_pos.x - 300, center_point_pos.y + 200 - 12, 200, 24)))
             // if (button("Yes", rectangle_from(start_btn_pos.x, start_btn_pos.y, 200, 24)))
             {
+                send_message_to("ITEM:" + to_string(current_house), server_conn);
+                // send_message_to("CHOOSE:", server_conn);
+                write_line("Hi");
                 current_screen = WAITING_PAGE;
                 flag = false;
                 continue;
@@ -212,7 +217,8 @@ int main()
             clear_screen(COLOR_WHITE);
             // draw_bitmap(bitmap_list[current_house], center_point_pos.x - bmp_width / 2, (center_point_pos.y - bmp_height / 2) - 80, opt);
             draw_text(waiting_for_match, COLOR_BLACK, font_named("input"), 20, header_pos.x, header_pos.y);
-            if (button("AUCTION STARTED", rectangle_from(center_point_pos.x - 300, center_point_pos.y + 200 - 12, 200, 24)))
+            // if (button("AUCTION STARTED", rectangle_from(center_point_pos.x - 300, center_point_pos.y + 200 - 12, 200, 24)))
+            if (flag1 == 2)
             {
                 current_screen = AUCTION_PAGE;
             };

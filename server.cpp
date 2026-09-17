@@ -3,7 +3,7 @@ using namespace std;
 
 int main()
 {
-    server_socket MainServer = create_server("Main", 49152);
+    server_socket MainServer = create_server("Main", 6000);
     write_line("Server started, waiting for connections...");
 
     while (true)
@@ -19,9 +19,12 @@ int main()
         {
             message msg = read_message(MainServer);
             string data = message_data(msg);
+            // if (to_integer(data) != 30)
+            // {
             write_line("Received: " + data);
+            // }
 
-            broadcast_message(data, MainServer); // ✅ THÊM dòng này — gửi lại cho TẤT CẢ client đang kết nối
+            broadcast_message(data, MainServer);
 
             close_message(msg);
         }
