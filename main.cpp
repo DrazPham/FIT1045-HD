@@ -6,7 +6,10 @@ enum GameScreen
 {
     MAIN_MENU,
     HOUSE_SELECTION,
-    AUCTION_PAGE
+    AUCTION_PAGE,
+    WAITING_PAGE,
+    USER_PAGE,
+    ADMIN_PAGE
 };
 GameScreen current_screen = MAIN_MENU;
 
@@ -53,6 +56,9 @@ int main()
     footer_pos.x = screen_max_width_postion * 0.5;
     footer_pos.y = screen_max_height_postion * 0.92;
 
+    point_2d house_price_pos;
+    point_2d house_description_pos;
+
     bitmap first_house = load_bitmap("first_house_image", "first_house.jpg");
     bitmap second_house = load_bitmap("second_house_image", "second_house.jpg");
     bitmap third_house = load_bitmap("third_house_image", "third_house.jpg");
@@ -79,6 +85,7 @@ int main()
 
     bool flag;
     int current_price = 100;
+    int timer_set = 100;
     string name = "";
     string header = "HouseMatch";
     string title = "Swipe. Match. Win.";
@@ -86,6 +93,15 @@ int main()
     string footer = "A real-time house-buying game";
     string house_price = "$650,00";
     string house_description = "4 bed - 2 bath - Glen Waverley";
+    string waiting_for_match = "Waiting for match";
+    string waiting_for_match_description = "Whe might start the auction the moment another user clicks YES to this house";
+    string HOUSE_MATCH_DASHBOARD = "HOUSEMATCH - DASHBOARD";
+    string HOUSE_OWNED = "HOUSE OWNED:";
+    string HOUSE_AVAILABLE = "HOUSE AVAILABLE:";
+    string HOUSE_UNSOLD = "HOUSE_UNSOLD";
+    string HOUSE_TOTAL = "HOUSE_TOTAL";
+    string HOUSE_REMAINING = "HOUSE_REMAINING";
+    int total_revenue = 100;
 
     bool is_entering_name = false;
     while (!quit_requested())
@@ -130,7 +146,7 @@ int main()
             if (button("Yes", rectangle_from(center_point_pos.x - 300, center_point_pos.y + 200 - 12, 200, 24)))
             // if (button("Yes", rectangle_from(start_btn_pos.x, start_btn_pos.y, 200, 24)))
             {
-                current_screen = AUCTION_PAGE;
+                current_screen = WAITING_PAGE;
                 flag = false;
                 continue;
             }
@@ -142,40 +158,58 @@ int main()
                     current_house = (HOUSE)rnd(0, 2);
                 } while (current_house == temp);
             }
+            if (flag)
+            {
+                // draw_sprite(sprite_list[current_house]);
+                draw_bitmap(bitmap_list[current_house], center_point_pos.x - bmp_width / 2, (center_point_pos.y - bmp_height / 2) - 80, opt);
+
+                house_price_pos.x = 300;
+                house_price_pos.y = 400;
+
+                house_description_pos.x = 300;
+                house_description_pos.y = 450;
+                draw_text("$" + to_string(house_list_detail[current_house].price), COLOR_BLACK, font_named("input"), 20, house_price_pos.x, house_price_pos.y);
+                draw_text(house_list_detail[current_house].house_name, COLOR_BLACK, font_named("input"), 20, house_description_pos.x, house_description_pos.y);
+                current_price = house_list_detail[current_house].price;
+
+                draw_bitmap(bitmap_list[current_house], center_point_pos.x - bmp_width / 2, (center_point_pos.y - bmp_height / 2) - 80, opt);
+                house_price_pos.x = 300;
+                house_price_pos.y = 400;
+
+                house_description_pos.x = 300;
+                house_description_pos.y = 450;
+                draw_text("$" + to_string(current_price), COLOR_BLACK, font_named("input"), 20, house_price_pos.x, house_price_pos.y);
+                draw_text(house_list_detail[current_house].house_name, COLOR_BLACK, font_named("input"), 20, house_description_pos.x, house_description_pos.y);
+            };
         }
-        // clear_screen(COLOR_WHITE);
-        if (flag)
+        else if (current_screen == WAITING_PAGE)
         {
-            // draw_sprite(sprite_list[current_house]);
-            draw_bitmap(bitmap_list[current_house], center_point_pos.x - bmp_width / 2, (center_point_pos.y - bmp_height / 2) - 80, opt);
-            point_2d house_price_pos;
-            house_price_pos.x = 300;
-            house_price_pos.y = 400;
-
-            point_2d house_description_pos;
-            house_description_pos.x = 300;
-            house_description_pos.y = 450;
-            draw_text("$" + to_string(house_list_detail[current_house].price), COLOR_BLACK, font_named("input"), 20, house_price_pos.x, house_price_pos.y);
-            draw_text(house_list_detail[current_house].house_name, COLOR_BLACK, font_named("input"), 20, house_description_pos.x, house_description_pos.y);
-            current_price = house_list_detail[current_house].price;
-        };
-        if (current_screen == AUCTION_PAGE)
+            clear_screen(COLOR_WHITE);
+            // draw_bitmap(bitmap_list[current_house], center_point_pos.x - bmp_width / 2, (center_point_pos.y - bmp_height / 2) - 80, opt);
+            draw_text(waiting_for_match, COLOR_BLACK, font_named("input"), 20, header_pos.x, header_pos.y);
+            if (button("AUCTION STARTED", rectangle_from(center_point_pos.x - 300, center_point_pos.y + 200 - 12, 200, 24)))
+            {
+                current_screen = AUCTION_PAGE;
+            };
+        }
+        else if (current_screen == AUCTION_PAGE)
         {
-            draw_bitmap(bitmap_list[current_house], center_point_pos.x - bmp_width / 2, (center_point_pos.y - bmp_height / 2) - 80, opt);
-            draw_bitmap(bitmap_list[current_house], center_point_pos.x - bmp_width / 2, (center_point_pos.y - bmp_height / 2) - 80, opt);
-            point_2d house_price_pos;
-            house_price_pos.x = 300;
-            house_price_pos.y = 400;
-
-            point_2d house_description_pos;
-            house_description_pos.x = 300;
-            house_description_pos.y = 450;
+            draw_text("Remaining time:" + to_string(timer_set), COLOR_BLACK, font_named("input"), 20, header_pos.x + 200, header_pos.y);
             draw_text("$" + to_string(current_price), COLOR_BLACK, font_named("input"), 20, house_price_pos.x, house_price_pos.y);
-            draw_text(house_list_detail[current_house].house_name, COLOR_BLACK, font_named("input"), 20, house_description_pos.x, house_description_pos.y);
+
+            draw_bitmap(bitmap_list[current_house], center_point_pos.x - bmp_width / 2, (center_point_pos.y - bmp_height / 2) - 80, opt);
 
             if (button("+100 AUD", rectangle_from(center_point_pos.x - 300, center_point_pos.y + 200 - 12, 200, 24)))
             {
                 current_price += 100;
+            };
+            if (button("+200 AUD", rectangle_from(center_point_pos.x - 300, center_point_pos.y + 230 - 12, 200, 24)))
+            {
+                current_price += 200;
+            };
+            if (button("+300 AUD", rectangle_from(center_point_pos.x - 300, center_point_pos.y + 260 - 12, 200, 24)))
+            {
+                current_price += 300;
             };
 
             rectangle rect = rectangle_from(500.0, 550.0, 200.0, 30.0);
@@ -212,6 +246,33 @@ int main()
                     is_entering_name = false;
                 }
             }
+            if (button("NEXT", rectangle_from(0, 300, 200, 24)))
+            {
+                current_screen = USER_PAGE;
+            };
+        }
+        else if (current_screen == USER_PAGE)
+        {
+            clear_screen(COLOR_WHITE);
+            // draw_bitmap(bitmap_list[current_house], center_point_pos.x - bmp_width / 2, (center_point_pos.y - bmp_height / 2) - 80, opt);
+            draw_text(HOUSE_MATCH_DASHBOARD, COLOR_BLACK, font_named("input"), 20, header_pos.x, header_pos.y);
+            draw_text(HOUSE_OWNED, COLOR_BLACK, font_named("input"), 20, header_pos.x, header_pos.y + 30);
+            draw_text(HOUSE_AVAILABLE, COLOR_BLACK, font_named("input"), 20, header_pos.x, header_pos.y + 60);
+
+            if (button("NEXT", rectangle_from(0, 300, 200, 24)))
+            {
+                current_screen = ADMIN_PAGE;
+            };
+        }
+        else if (current_screen == ADMIN_PAGE)
+        {
+            clear_screen(COLOR_WHITE);
+            // draw_bitmap(bitmap_list[current_house], center_point_pos.x - bmp_width / 2, (center_point_pos.y - bmp_height / 2) - 80, opt);
+            draw_text(HOUSE_MATCH_DASHBOARD, COLOR_BLACK, font_named("input"), 20, header_pos.x, header_pos.y);
+            draw_text(HOUSE_UNSOLD, COLOR_BLACK, font_named("input"), 20, header_pos.x, header_pos.y + 30);
+            draw_text(HOUSE_UNSOLD, COLOR_BLACK, font_named("input"), 20, header_pos.x, header_pos.y + 60);
+            draw_text(HOUSE_REMAINING, COLOR_BLACK, font_named("input"), 20, header_pos.x, header_pos.y + 90);
+            draw_text(to_string(total_revenue), COLOR_BLACK, font_named("input"), 20, header_pos.x, header_pos.y + 120);
         }
         draw_interface();
         refresh_screen();
