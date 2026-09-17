@@ -29,7 +29,12 @@ struct house_detail
 
 int main()
 {
+    connection server_conn = open_connection("client1", "127.0.0.1", 49152);
     open_window("My Interface!", 800, 600);
+    if (!is_connection_open(server_conn))
+    {
+        write_line("WARNING: Could not connect to server!");
+    };
 
     load_font("input", "arial.ttf");
     double screen_max_width_postion = screen_width();
@@ -106,6 +111,25 @@ int main()
     bool is_entering_name = false;
     while (!quit_requested())
     {
+        check_network_activity();
+
+        while (has_messages(server_conn))
+        {
+            message message_log = read_message(server_conn);
+            string data = message_data(message_log);
+            // write_line("Received: " + data);
+
+            if (is_integer(data))
+            {
+                current_price = to_integer(data);
+            }
+            else
+            {
+                // write_line("Ignored invalid message: " + data);
+            }
+
+            close_message(message_log);
+        }
         process_events();
         clear_screen(COLOR_WHITE);
         double bmp_width = bitmap_width(bitmap_list[current_house]);
@@ -170,7 +194,6 @@ int main()
                 house_description_pos.y = 450;
                 draw_text("$" + to_string(house_list_detail[current_house].price), COLOR_BLACK, font_named("input"), 20, house_price_pos.x, house_price_pos.y);
                 draw_text(house_list_detail[current_house].house_name, COLOR_BLACK, font_named("input"), 20, house_description_pos.x, house_description_pos.y);
-                current_price = house_list_detail[current_house].price;
 
                 draw_bitmap(bitmap_list[current_house], center_point_pos.x - bmp_width / 2, (center_point_pos.y - bmp_height / 2) - 80, opt);
                 house_price_pos.x = 300;
@@ -184,6 +207,8 @@ int main()
         }
         else if (current_screen == WAITING_PAGE)
         {
+            current_price = house_list_detail[current_house].price;
+            send_message_to(to_string(current_price), server_conn);
             clear_screen(COLOR_WHITE);
             // draw_bitmap(bitmap_list[current_house], center_point_pos.x - bmp_width / 2, (center_point_pos.y - bmp_height / 2) - 80, opt);
             draw_text(waiting_for_match, COLOR_BLACK, font_named("input"), 20, header_pos.x, header_pos.y);
@@ -194,6 +219,7 @@ int main()
         }
         else if (current_screen == AUCTION_PAGE)
         {
+
             draw_text("Remaining time:" + to_string(timer_set), COLOR_BLACK, font_named("input"), 20, header_pos.x + 200, header_pos.y);
             draw_text("$" + to_string(current_price), COLOR_BLACK, font_named("input"), 20, house_price_pos.x, house_price_pos.y);
 
@@ -202,14 +228,17 @@ int main()
             if (button("+100 AUD", rectangle_from(center_point_pos.x - 300, center_point_pos.y + 200 - 12, 200, 24)))
             {
                 current_price += 100;
+                send_message_to(to_string(current_price), server_conn);
             };
             if (button("+200 AUD", rectangle_from(center_point_pos.x - 300, center_point_pos.y + 230 - 12, 200, 24)))
             {
                 current_price += 200;
+                send_message_to(to_string(current_price), server_conn);
             };
             if (button("+300 AUD", rectangle_from(center_point_pos.x - 300, center_point_pos.y + 260 - 12, 200, 24)))
             {
                 current_price += 300;
+                send_message_to(to_string(current_price), server_conn);
             };
 
             rectangle rect = rectangle_from(500.0, 550.0, 200.0, 30.0);
