@@ -39,7 +39,7 @@ string vigenere_cipher_decode(const string &input, const string &keyword)
 int main()
 {
     connection server_info = open_connection("client1", "127.0.0.1", 6345);
-    open_window("LOGIN!", 800, 600);
+    open_window("REGISTER!", 800, 600);
     load_font("input", "arial.ttf");
 
     string encoded_message;
@@ -113,20 +113,28 @@ int main()
                 }
             }
         }
-        if (button("CREATE", rectangle_from(center_point_pos.x - 100, center_point_pos.y + 60, 200, 30)))
-        {
-            // write_line("USERNAME: " + user1.username);
-            // write_line("PWD:  " + user1.pwd);
-            string password_detail = "Username: " + user1.username + ", Pwd: " + user1.pwd;
-            encoded_message = vigenere_cipher_encode(password_detail, keyword);
-            send_message_to(encoded_message, server_info);
-            write_line("ENCODED" + encoded_message);
-        };
-
-        // if (button("FETCH", rectangle_from(center_point_pos.x - 300, center_point_pos.y + 120, 200, 30)))
+        // if (button("CREATE", rectangle_from(center_point_pos.x - 100, center_point_pos.y + 60, 200, 30)))
         // {
-        //     write_line(fetch_data);
+        //     // write_line("USERNAME: " + user1.username);
+        //     // write_line("PWD:  " + user1.pwd);
+        //     encoded_message = vigenere_cipher_encode(password_detail, keyword);
+        //     send_message_to(encoded_message, server_info);
+        //     write_line("ENCODED" + encoded_message);
         // };
+
+        if (button("FETCH", rectangle_from(center_point_pos.x - 300, center_point_pos.y + 120, 200, 30)))
+        {
+            string decrypted_msg = vigenere_cipher_decode(fetch_data, keyword);
+            string password_detail = "Username: " + user1.username + ", Pwd: " + user1.pwd;
+            write_line(decrypted_msg);
+            if (decrypted_msg == password_detail)
+                write_line("VALID");
+            else
+            {
+                write_line("INVALID");
+                // string password_detail = "Username: " + user1.username + ", Pwd: " + user1.pwd;
+            }
+        };
 
         draw_interface();
         refresh_screen();
