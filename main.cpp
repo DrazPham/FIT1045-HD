@@ -17,7 +17,16 @@ enum HOUSE
 {
     first_house,
     second_house,
-    third_house
+    third_house,
+    fourth_house,
+    fifth_house,
+    sixth_house,
+    seventh_house,
+    eighth_house,
+    nineth_house,
+    tenth_house,
+    eleventh_house,
+    twelveth_house
 };
 HOUSE current_house = first_house;
 
@@ -67,24 +76,31 @@ int main()
     bitmap first_house = load_bitmap("first_house_image", "first_house.jpg");
     bitmap second_house = load_bitmap("second_house_image", "second_house.jpg");
     bitmap third_house = load_bitmap("third_house_image", "third_house.jpg");
-    // sprite first_house_sprite = create_sprite(first_house);
-    // sprite second_house_sprite = create_sprite(second_house);
-    // sprite third_house_sprite = create_sprite(third_house);
+    bitmap fourth_house = load_bitmap("fourth_house_image", "fourth_house.jpg");
+    bitmap fifth_house = load_bitmap("fifth_house_image", "fifth_house.jpg");
+    bitmap sixth_house = load_bitmap("sixth_house_image", "sixth_house.jpg");
+    bitmap seventh_house = load_bitmap("seventh_house_image", "seventh_house.jpg");
+    bitmap eighth_house = load_bitmap("eighth_house_image", "eighth_house.jpg");
+    bitmap nineth_house = load_bitmap("nineth_house_image", "nineth_house.jpg");
+    bitmap tenth_house = load_bitmap("tenth_house_image", "tenth_house.jpg");
+    bitmap eleventh_house = load_bitmap("eleventh_house_image", "eleventh_house.jpg");
+    bitmap twelveth_house = load_bitmap("twelveth_house_image", "twelveth_house.jpg");
 
-    // sprite sprite_list[3] = {first_house_sprite, second_house_sprite, third_house_sprite};
+    bitmap bitmap_list[12] = {first_house, second_house, third_house, fourth_house, fifth_house, sixth_house, seventh_house, eighth_house, nineth_house, tenth_house, eleventh_house, twelveth_house};
 
-    // sprite_set_x(first_house_sprite, center_point_pos.x - sprite_width(first_house_sprite) / 2);
-    // sprite_set_y(first_house_sprite, center_point_pos.y - sprite_height(first_house_sprite) / 2);
-    // sprite_set_x(second_house_sprite, center_point_pos.x - sprite_width(second_house_sprite) / 2);
-    // sprite_set_y(second_house_sprite, center_point_pos.y - sprite_height(second_house_sprite) / 2);
-    // sprite_set_x(third_house_sprite, center_point_pos.x - sprite_width(third_house_sprite) / 2);
-    // sprite_set_y(third_house_sprite, center_point_pos.y - sprite_height(third_house_sprite) / 2);
-
-    bitmap bitmap_list[3] = {first_house, second_house, third_house};
-    house_detail house_list_detail[3] = {
-        {30, "House A"},
-        {650000, "House B"},
-        {800000, "House C"}};
+    house_detail house_list_detail[12] = {
+        {650000, "House A"},
+        {720000, "House B"},
+        {800000, "House C"},
+        {540000, "House D"},
+        {910000, "House E"},
+        {675000, "House F"},
+        {1050000, "House G"},
+        {485000, "House H"},
+        {830000, "House I"},
+        {760000, "House J"},
+        {995000, "House K"},
+        {620000, "House L"}};
     double target_width = 400;
     double target_height = 300;
 
@@ -124,10 +140,16 @@ int main()
             {
                 current_price = to_integer(data);
             }
-            else if (data == "ITEM:0")
+            else
             {
-                write_line("TRUE");
-                flag1 += 1;
+                for (int i = 0; i < 12; i++)
+                {
+                    if (data == ("ITEM:" + to_string(i)))
+                    {
+                        write_line(i);
+                        flag1 += 1;
+                    }
+                }
             }
 
             close_message(message_log);
@@ -174,7 +196,7 @@ int main()
             {
                 send_message_to("ITEM:" + to_string(current_house), server_conn);
                 // send_message_to("CHOOSE:", server_conn);
-                write_line("Hi");
+                // write_line("Hi");
                 current_screen = WAITING_PAGE;
                 flag = false;
                 continue;
@@ -184,31 +206,31 @@ int main()
                 int temp = current_house;
                 do
                 {
-                    current_house = (HOUSE)rnd(0, 2);
+                    current_house = (HOUSE)rnd(0, 11);
                 } while (current_house == temp);
             }
-            if (flag)
-            {
-                // draw_sprite(sprite_list[current_house]);
-                draw_bitmap(bitmap_list[current_house], center_point_pos.x - bmp_width / 2, (center_point_pos.y - bmp_height / 2) - 80, opt);
+            // if (flag)
+            // {
+            // draw_sprite(sprite_list[current_house]);
+            draw_bitmap(bitmap_list[current_house], center_point_pos.x - bmp_width / 2, (center_point_pos.y - bmp_height / 2) - 80, opt);
 
-                house_price_pos.x = 300;
-                house_price_pos.y = 400;
+            house_price_pos.x = 300;
+            house_price_pos.y = 400;
 
-                house_description_pos.x = 300;
-                house_description_pos.y = 450;
-                draw_text("$" + to_string(house_list_detail[current_house].price), COLOR_BLACK, font_named("input"), 20, house_price_pos.x, house_price_pos.y);
-                draw_text(house_list_detail[current_house].house_name, COLOR_BLACK, font_named("input"), 20, house_description_pos.x, house_description_pos.y);
+            house_description_pos.x = 300;
+            house_description_pos.y = 450;
+            draw_text("$" + to_string(house_list_detail[current_house].price), COLOR_BLACK, font_named("input"), 20, house_price_pos.x, house_price_pos.y);
+            draw_text(house_list_detail[current_house].house_name, COLOR_BLACK, font_named("input"), 20, house_description_pos.x, house_description_pos.y);
 
-                draw_bitmap(bitmap_list[current_house], center_point_pos.x - bmp_width / 2, (center_point_pos.y - bmp_height / 2) - 80, opt);
-                house_price_pos.x = 300;
-                house_price_pos.y = 400;
+            draw_bitmap(bitmap_list[current_house], center_point_pos.x - bmp_width / 2, (center_point_pos.y - bmp_height / 2) - 80, opt);
+            house_price_pos.x = 300;
+            house_price_pos.y = 400;
 
-                house_description_pos.x = 300;
-                house_description_pos.y = 450;
-                draw_text("$" + to_string(current_price), COLOR_BLACK, font_named("input"), 20, house_price_pos.x, house_price_pos.y);
-                draw_text(house_list_detail[current_house].house_name, COLOR_BLACK, font_named("input"), 20, house_description_pos.x, house_description_pos.y);
-            };
+            house_description_pos.x = 300;
+            house_description_pos.y = 450;
+            // draw_text("$" + to_string(current_price), COLOR_BLACK, font_named("input"), 20, house_price_pos.x, house_price_pos.y);
+            draw_text(house_list_detail[current_house].house_name, COLOR_BLACK, font_named("input"), 20, house_description_pos.x, house_description_pos.y);
+            // };
         }
         else if (current_screen == WAITING_PAGE)
         {
