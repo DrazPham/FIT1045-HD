@@ -8,6 +8,7 @@ enum GameScreen
     HOUSE_SELECTION,
     AUCTION_PAGE,
     WAITING_PAGE,
+    HOUSE_MORE_INFORMATION,
     USER_PAGE,
     ADMIN_PAGE
 };
@@ -34,17 +35,27 @@ struct house_detail
 {
     int price;
     string house_name;
+    int bedrooms;
+    int bathrooms;
+    string location;
+    double land_size;
+    double floor_area;
+    string house_type;
+    int year_built;
+    int garage_spaces;
+    bool has_garden;
+    bool has_pool;
+    string orientation;
+    string condition;
 };
 
 int main()
 {
     string time_left = "";
+    int total_house = 12;
     connection server_conn = open_connection("client1", "127.0.0.1", 6000);
     open_window("My Interface!", 800, 600);
     timer minute_countdown = create_timer("1 Minute");
-    start_timer(minute_countdown);
-    // int one_minute = 60;
-    int one_minute = 30;
     unsigned long current_time = 0;
     if (!is_connection_open(server_conn))
     {
@@ -92,27 +103,25 @@ int main()
     bitmap eleventh_house = load_bitmap("eleventh_house_image", "eleventh_house.jpg");
     bitmap twelveth_house = load_bitmap("twelveth_house_image", "twelveth_house.jpg");
 
-    bitmap bitmap_list[12] = {first_house, second_house, third_house, fourth_house, fifth_house, sixth_house, seventh_house, eighth_house, nineth_house, tenth_house, eleventh_house, twelveth_house};
-    bool bitmap_list_check[12] = {true};
-    house_detail house_list_detail[12] = {
-        {650000, "House A"},
-        {720000, "House B"},
-        {800000, "House C"},
-        {540000, "House D"},
-        {910000, "House E"},
-        {675000, "House F"},
-        {1050000, "House G"},
-        {485000, "House H"},
-        {830000, "House I"},
-        {760000, "House J"},
-        {995000, "House K"},
-        {620000, "House L"}};
+    bitmap bitmap_list[total_house] = {first_house, second_house, third_house, fourth_house, fifth_house, sixth_house, seventh_house, eighth_house, nineth_house, tenth_house, eleventh_house, twelveth_house};
+    bool bitmap_list_check[total_house] = {true};
+    house_detail house_list_detail[total_house] = {
+        {650000, "House A", 3, 2, "Clayton", 450.0, 180.0, "Single Storey", 2005, 2, true, false, "North", "Well Maintained"},
+        {720000, "House B", 4, 2, "Glen Waverley", 520.0, 220.0, "Double Storey", 2012, 2, true, false, "East", "Excellent"},
+        {800000, "House C", 4, 3, "Box Hill", 480.0, 240.0, "Double Storey", 2018, 2, true, true, "North", "Brand New"},
+        {540000, "House D", 2, 1, "Springvale", 320.0, 110.0, "Townhouse", 1995, 1, false, false, "West", "Needs Renovation"},
+        {910000, "House E", 5, 3, "Doncaster", 650.0, 310.0, "Double Storey", 2020, 3, true, true, "South", "Brand New"},
+        {675000, "House F", 3, 2, "Mulgrave", 400.0, 175.0, "Single Storey", 2008, 2, true, false, "East", "Well Maintained"},
+        {1050000, "House G", 5, 4, "Camberwell", 720.0, 350.0, "Double Storey", 2021, 3, true, true, "North", "Brand New"},
+        {485000, "House H", 2, 1, "Noble Park", 280.0, 95.0, "Unit", 1988, 1, false, false, "West", "Needs Renovation"},
+        {830000, "House I", 4, 2, "Blackburn", 500.0, 230.0, "Double Storey", 2015, 2, true, false, "South", "Excellent"},
+        {760000, "House J", 3, 2, "Burwood", 430.0, 190.0, "Single Storey", 2010, 2, true, false, "East", "Well Maintained"},
+        {995000, "House K", 5, 3, "Balwyn", 680.0, 320.0, "Double Storey", 2019, 3, true, true, "North", "Excellent"},
+        {620000, "House L", 3, 2, "Oakleigh", 390.0, 165.0, "Townhouse", 2003, 2, false, false, "West", "Well Maintained"}};
     double target_width = 400;
     double target_height = 300;
 
-    bool flag;
     int current_price = 100;
-    int timer_set = 100;
     string name = "";
     string header = "HouseMatch";
     string title = "Swipe. Match. Win.";
@@ -129,7 +138,8 @@ int main()
     string HOUSE_TOTAL = "HOUSE_TOTAL";
     string HOUSE_REMAINING = "HOUSE_REMAINING";
     int total_revenue = 100;
-    int flag_count = 0;
+    int flag_count = 1;
+    bool flag;
     bool is_entering_name = false;
     int flag1 = 0;
     while (!quit_requested())
@@ -140,7 +150,6 @@ int main()
         {
             message message_log = read_message(server_conn);
             string data = message_data(message_log);
-            // write_line("Received: " + data);
 
             if (is_integer(data))
             {
@@ -152,11 +161,10 @@ int main()
             }
             else
             {
-                for (int i = 0; i < 12; i++)
+                for (int i = 0; i < total_house; i++)
                 {
                     if (data == ("ITEM:" + to_string(i)))
                     {
-                        write_line(i);
                         flag1 += 1;
                     }
                 }
@@ -205,17 +213,19 @@ int main()
             // if (button("Yes", rectangle_from(start_btn_pos.x, start_btn_pos.y, 200, 24)))
             {
                 send_message_to("ITEM:" + to_string(current_house), server_conn);
-                // send_message_to("CHOOSE:", server_conn);
-                // write_line("Hi");
                 current_screen = WAITING_PAGE;
-                flag = false;
                 continue;
+            }
+            if (button("MORE_INFO", rectangle_from(center_point_pos.x, center_point_pos.y + 100 - 12, 200, 24)))
+            // if (button("Yes", rectangle_from(start_btn_pos.x, start_btn_pos.y, 200, 24)))
+            {
+                current_screen = HOUSE_MORE_INFORMATION;
             }
             if (button("No", rectangle_from(center_point_pos.x + 100, center_point_pos.y + 200 - 12, 200, 24)))
             {
                 if (flag_count == 12)
                 {
-                    for (int i = 0; i < 12; i++) // ✅ reset TỪNG PHẦN TỬ, không khai báo lại biến
+                    for (int i = 0; i < total_house; i++)
                     {
                         bitmap_list_check[i] = false;
                     }
@@ -227,11 +237,10 @@ int main()
                 } while (bitmap_list_check[current_house]);
                 bitmap_list_check[current_house] = true;
                 flag_count++;
-                write_line(to_string(flag_count));
+                // write_line("Flag Count:" + to_string(flag_count));
+                // write_line("Total House:" + to_string(total_house));
             }
-            // if (flag)
-            // {
-            // draw_sprite(sprite_list[current_house]);
+
             draw_bitmap(bitmap_list[current_house], center_point_pos.x - bmp_width / 2, (center_point_pos.y - bmp_height / 2) - 80, opt);
 
             house_price_pos.x = 300;
@@ -249,7 +258,8 @@ int main()
             house_description_pos.x = 300;
             house_description_pos.y = 450;
             // draw_text("$" + to_string(current_price), COLOR_BLACK, font_named("input"), 20, house_price_pos.x, house_price_pos.y);
-            draw_text(house_list_detail[current_house].house_name, COLOR_BLACK, font_named("input"), 20, house_description_pos.x, house_description_pos.y);
+            string detail = house_list_detail[current_house].house_name + " - " + to_string(house_list_detail[current_house].bathrooms) + " bathrooms - " + to_string(house_list_detail[current_house].bedrooms) + " bedrooms - " + house_list_detail[current_house].location;
+            draw_text(detail, COLOR_BLACK, font_named("input"), 20, house_description_pos.x, house_description_pos.y);
             // };
         }
         else if (current_screen == WAITING_PAGE)
@@ -267,21 +277,33 @@ int main()
         }
         else if (current_screen == AUCTION_PAGE)
         {
+            // int one_minute = 60;
+            int one_minute = 10;
+            if (!flag)
+            {
+                start_timer(minute_countdown);
+                flag = true;
+            };
             current_time = timer_ticks(minute_countdown);
             int running_second = (int)current_time / 1000;
             int remaining_second = one_minute - running_second;
             if (remaining_second == 0)
             {
-                current_screen = HOUSE_SELECTION;
-                for (int i = 0; i < 12; i++)
+                current_screen = USER_PAGE;
+                for (int i = 0; i < total_house; i++)
                 { // SHOULD BE UPDATED  "12" not hardcoded
                     if (bitmap_list[i] == bitmap_list[current_house])
-                        for (int j = i; j < 12 - 1; j++)
+                    {
+                        for (int j = i; j < total_house - 1; j++)
                         {
                             bitmap_list[j] = bitmap_list[j + 1];
                             house_list_detail[i] = house_list_detail[i + 1];
                         }
+                        flag = false;
+                        flag1 = 0;
+                    }
                 }
+                total_house--;
             };
             send_message_to("TIME:" + to_string(remaining_second), server_conn);
             draw_text("Remaining time:" + time_left, COLOR_BLACK, font_named("input"), 20, header_pos.x + 200, header_pos.y);
@@ -331,18 +353,10 @@ int main()
                         {
                             current_price += to_integer(name);
                         }
-                        else
-                        {
-                            write_line("Invalid number entered: " + name);
-                        }
                     }
                     is_entering_name = false;
                 }
             }
-            // if (button("NEXT", rectangle_from(0, 300, 200, 24)))
-            // {
-            //     current_screen = USER_PAGE;
-            // };
         }
         else if (current_screen == USER_PAGE)
         {
@@ -353,6 +367,25 @@ int main()
             draw_text(HOUSE_AVAILABLE, COLOR_BLACK, font_named("input"), 20, header_pos.x, header_pos.y + 60);
 
             if (button("START CHOOSING", rectangle_from(0, 300, 200, 24)))
+            {
+                current_screen = HOUSE_SELECTION;
+            };
+        }
+        else if (current_screen == HOUSE_MORE_INFORMATION)
+        {
+            string detail_house_txt = "This " + house_list_detail[current_house].house_type + " home in " +
+                                      house_list_detail[current_house].location + " features " +
+                                      to_string(house_list_detail[current_house].bedrooms) + " spacious bedrooms and " +
+                                      to_string(house_list_detail[current_house].bathrooms) + " bathrooms, set on a generous " +
+                                      to_string(house_list_detail[current_house].land_size) + "m² block with a " +
+                                      to_string(house_list_detail[current_house].floor_area) + "m² floor plan. Built in " +
+                                      to_string(house_list_detail[current_house].year_built) + " and " +
+                                      to_lowercase(house_list_detail[current_house].condition) + ", this " +
+                                      house_list_detail[current_house].orientation + "-facing property comes with " +
+                                      to_string(house_list_detail[current_house].garage_spaces) + "-car garage space.";
+            draw_bitmap(bitmap_list[current_house], center_point_pos.x - bmp_width / 2, (center_point_pos.y - bmp_height / 2) - 80, opt);
+            draw_text(detail_house_txt, COLOR_BLACK, font_named("input"), 20, header_pos.x, header_pos.y + 200);
+            if (button("BACK TO CHOOSING", rectangle_from(start_btn_pos.x - 100, start_btn_pos.y - 12, 200, 24)))
             {
                 current_screen = HOUSE_SELECTION;
             };
