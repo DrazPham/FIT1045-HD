@@ -2,6 +2,8 @@
 #include "splashkit-arrays.h"
 #include "common.hpp"
 #include "string.h"
+#include <set>
+
 enum GameScreen
 {
     MAIN_MENU,
@@ -24,10 +26,10 @@ enum HOUSE
     sixth_house,
     seventh_house,
     eighth_house,
-    nineth_house,
+    ninth_house,
     tenth_house,
     eleventh_house,
-    twelveth_house
+    twelfth_house
 };
 HOUSE current_house = first_house;
 
@@ -51,8 +53,12 @@ struct house_detail
 
 int main()
 {
+    int property_count = 0;
     string time_left = "";
     int total_house = 12;
+    std::set<std::string> properties = {};
+    dynamic_array<house_detail> house_list_more;
+    const int total_house_const = 12;
     connection server_conn = open_connection("client1", "127.0.0.1", 6000);
     open_window("My Interface!", 800, 600);
     timer minute_countdown = create_timer("1 Minute");
@@ -98,14 +104,14 @@ int main()
     bitmap sixth_house = load_bitmap("sixth_house_image", "sixth_house.jpg");
     bitmap seventh_house = load_bitmap("seventh_house_image", "seventh_house.jpg");
     bitmap eighth_house = load_bitmap("eighth_house_image", "eighth_house.jpg");
-    bitmap nineth_house = load_bitmap("nineth_house_image", "nineth_house.jpg");
+    bitmap ninth_house = load_bitmap("ninth_house_image", "ninth_house.jpg");
     bitmap tenth_house = load_bitmap("tenth_house_image", "tenth_house.jpg");
     bitmap eleventh_house = load_bitmap("eleventh_house_image", "eleventh_house.jpg");
-    bitmap twelveth_house = load_bitmap("twelveth_house_image", "twelveth_house.jpg");
+    bitmap twelfth_house = load_bitmap("twelfth_house_image", "twelfth_house.jpg");
 
-    bitmap bitmap_list[total_house] = {first_house, second_house, third_house, fourth_house, fifth_house, sixth_house, seventh_house, eighth_house, nineth_house, tenth_house, eleventh_house, twelveth_house};
+    bitmap bitmap_list[total_house_const] = {first_house, second_house, third_house, fourth_house, fifth_house, sixth_house, seventh_house, eighth_house, ninth_house, tenth_house, eleventh_house, twelfth_house};
     bool bitmap_list_check[total_house] = {true};
-    house_detail house_list_detail[total_house] = {
+    house_detail house_list_detail[total_house_const] = {
         {650000, "House A", 3, 2, "Clayton", 450.0, 180.0, "Single Storey", 2005, 2, true, false, "North", "Well Maintained"},
         {720000, "House B", 4, 2, "Glen Waverley", 520.0, 220.0, "Double Storey", 2012, 2, true, false, "East", "Excellent"},
         {800000, "House C", 4, 3, "Box Hill", 480.0, 240.0, "Double Storey", 2018, 2, true, true, "North", "Brand New"},
@@ -223,20 +229,21 @@ int main()
             }
             if (button("No", rectangle_from(center_point_pos.x + 100, center_point_pos.y + 200 - 12, 200, 24)))
             {
-                if (flag_count == 12)
-                {
-                    for (int i = 0; i < total_house; i++)
-                    {
-                        bitmap_list_check[i] = false;
-                    }
-                    flag_count = 0;
-                }
-                do
-                {
-                    current_house = (HOUSE)rnd(0, 11);
-                } while (bitmap_list_check[current_house]);
-                bitmap_list_check[current_house] = true;
-                flag_count++;
+                // if (flag_count == 12)
+                // {
+                //     for (int i = 0; i < total_house; i++)
+                //     {
+                //         bitmap_list_check[i] = false;
+                //     }
+                //     flag_count = 0;
+                // }
+                // do
+                // {
+                current_house = (HOUSE)rnd(0, 3);
+                write_line(house_list_more[current_house].house_name);
+                // } while (bitmap_list_check[current_house]);
+                // bitmap_list_check[current_house] = true;
+                // flag_count++;
                 // write_line("Flag Count:" + to_string(flag_count));
                 // write_line("Total House:" + to_string(total_house));
             }
@@ -361,13 +368,62 @@ int main()
         else if (current_screen == USER_PAGE)
         {
             clear_screen(COLOR_WHITE);
+            bool my_bool = false;
+
+            rectangle checkbox1_container = rectangle_from(200, 300, 180, 50);
+            rectangle checkbox2_container = rectangle_from(200, 360, 180, 50);
+            rectangle checkbox3_container = rectangle_from(200, 420, 180, 50);
+            rectangle checkbox4_container = rectangle_from(200, 480, 180, 50);
+            if (checkbox("<2 Bedrooms", my_bool, checkbox1_container))
+            {
+                properties.insert("<2 Bedrooms");
+                property_count += 1;
+            }
+            else if (checkbox("<2 Bathrooms", my_bool, checkbox2_container))
+            {
+                properties.insert("<2 Bathrooms");
+                property_count += 2;
+            }
+            else if (checkbox("Pool", my_bool, checkbox3_container))
+            {
+                properties.insert("Pool");
+                property_count += 4;
+            }
+            else if (checkbox("Garden", my_bool, checkbox4_container))
+            {
+                properties.insert("Garden");
+                property_count += 8;
+            };
             // draw_bitmap(bitmap_list[current_house], center_point_pos.x - bmp_width / 2, (center_point_pos.y - bmp_height / 2) - 80, opt);
             draw_text(HOUSE_MATCH_DASHBOARD, COLOR_BLACK, font_named("input"), 20, header_pos.x, header_pos.y);
+            ///
             draw_text(HOUSE_OWNED, COLOR_BLACK, font_named("input"), 20, header_pos.x, header_pos.y + 30);
+            draw_text("0", COLOR_BLACK, font_named("input"), 20, header_pos.x + 250, header_pos.y + 30);
+
+            // a
             draw_text(HOUSE_AVAILABLE, COLOR_BLACK, font_named("input"), 20, header_pos.x, header_pos.y + 60);
+            draw_text(to_string(total_house), COLOR_BLACK, font_named("input"), 20, header_pos.x + 250, header_pos.y + 60);
 
             if (button("START CHOOSING", rectangle_from(0, 300, 200, 24)))
             {
+                switch (property_count)
+                {
+                case 4:
+                {
+                    for (int i = 0; i < total_house; i++)
+                        if (house_list_detail[i].has_pool)
+                            add(house_list_more, house_list_detail[i]);
+                    break;
+                }
+                // case 2:
+                //     break;
+                // case 4:
+                //     break;
+                // case 8:
+                //     break;
+                default:
+                    break;
+                }
                 current_screen = HOUSE_SELECTION;
             };
         }
@@ -395,10 +451,15 @@ int main()
             clear_screen(COLOR_WHITE);
             // draw_bitmap(bitmap_list[current_house], center_point_pos.x - bmp_width / 2, (center_point_pos.y - bmp_height / 2) - 80, opt);
             draw_text(HOUSE_MATCH_DASHBOARD, COLOR_BLACK, font_named("input"), 20, header_pos.x, header_pos.y);
-            draw_text(HOUSE_UNSOLD, COLOR_BLACK, font_named("input"), 20, header_pos.x, header_pos.y + 30);
+            //
+            draw_text(HOUSE_TOTAL, COLOR_BLACK, font_named("input"), 20, header_pos.x, header_pos.y + 30);
+            draw_text(to_string(total_house_const), COLOR_BLACK, font_named("input"), 20, header_pos.x + 250, header_pos.y + 30);
+            //
             draw_text(HOUSE_UNSOLD, COLOR_BLACK, font_named("input"), 20, header_pos.x, header_pos.y + 60);
+            draw_text(to_string(total_house), COLOR_BLACK, font_named("input"), 20, header_pos.x + 250, header_pos.y + 30);
+            //
             draw_text(HOUSE_REMAINING, COLOR_BLACK, font_named("input"), 20, header_pos.x, header_pos.y + 90);
-            draw_text(to_string(total_revenue), COLOR_BLACK, font_named("input"), 20, header_pos.x, header_pos.y + 120);
+            draw_text(to_string(total_house_const - total_house), COLOR_BLACK, font_named("input"), 20, header_pos.x + 250, header_pos.y + 120);
         }
         draw_interface();
         refresh_screen();
