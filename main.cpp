@@ -53,6 +53,7 @@ struct house_detail
 
 int main()
 {
+    int extra_time_added = 0;
     int property_count = 0;
     string time_left = "";
     int total_house = 12;
@@ -127,8 +128,14 @@ int main()
     double target_width = 400;
     double target_height = 300;
 
+    string name = "unknown";
+    string display_name = "";
+    bool was_reading = false;
+    rectangle input_rect = rectangle_from(230.0, 50.0, 200.0, 30.0);
+    rectangle button_rect = rectangle_from(230.0, 100.0, 100.0, 40.0);
+
     int current_price = 100;
-    string name = "";
+    // string name = "";
     string header = "HouseMatch";
     string title = "Swipe. Match. Win.";
     string tag_line = "Find a house you love, get matched with another buyer, and settle it with a live bid.";
@@ -143,6 +150,7 @@ int main()
     string HOUSE_UNSOLD = "HOUSE_UNSOLD";
     string HOUSE_TOTAL = "HOUSE_TOTAL";
     string HOUSE_REMAINING = "HOUSE_REMAINING";
+    int time_temp;
     int total_revenue = 100;
     int flag_count = 1;
     bool flag;
@@ -284,8 +292,7 @@ int main()
         }
         else if (current_screen == AUCTION_PAGE)
         {
-            // int one_minute = 60;
-            int one_minute = 10;
+            int one_minute = 30;
             if (!flag)
             {
                 start_timer(minute_countdown);
@@ -293,12 +300,12 @@ int main()
             };
             current_time = timer_ticks(minute_countdown);
             int running_second = (int)current_time / 1000;
-            int remaining_second = one_minute - running_second;
+            int remaining_second = one_minute - running_second + extra_time_added;
             if (remaining_second == 0)
             {
                 current_screen = USER_PAGE;
                 for (int i = 0; i < total_house; i++)
-                { // SHOULD BE UPDATED  "12" not hardcoded
+                {
                     if (bitmap_list[i] == bitmap_list[current_house])
                     {
                         for (int j = i; j < total_house - 1; j++)
@@ -312,6 +319,22 @@ int main()
                 }
                 total_house--;
             };
+            double bar_x = center_point_pos.x - 100;
+            double bar_y = 0;
+            double bar_width = 200;
+            double bar_height = 30;
+
+            fill_rectangle(COLOR_GRAY, rectangle_from(bar_x, bar_y, bar_width, bar_height));
+
+            double progress_ratio = (double)remaining_second / one_minute;
+            if (progress_ratio < 0)
+                progress_ratio = 0;
+            if (progress_ratio > 1)
+                progress_ratio = 1;
+
+            double filled_width = bar_width * progress_ratio;
+            fill_rectangle(COLOR_GREEN, rectangle_from(bar_x, bar_y, filled_width, bar_height));
+
             send_message_to("TIME:" + to_string(remaining_second), server_conn);
             draw_text("Remaining time:" + time_left, COLOR_BLACK, font_named("input"), 20, header_pos.x + 200, header_pos.y);
             draw_text("$" + to_string(current_price), COLOR_BLACK, font_named("input"), 20, house_price_pos.x, house_price_pos.y);
@@ -320,50 +343,75 @@ int main()
 
             if (button("+100 AUD", rectangle_from(center_point_pos.x - 300, center_point_pos.y + 200 - 12, 200, 24)))
             {
+                if (remaining_second > 0 && remaining_second < 15)
+                {
+                    extra_time_added += 15;
+                }
                 current_price += 100;
                 send_message_to(to_string(current_price), server_conn);
             };
             if (button("+200 AUD", rectangle_from(center_point_pos.x - 300, center_point_pos.y + 230 - 12, 200, 24)))
             {
+                if (remaining_second > 0 && remaining_second < 15)
+                {
+                    extra_time_added += 15;
+                };
                 current_price += 200;
                 send_message_to(to_string(current_price), server_conn);
             };
             if (button("+300 AUD", rectangle_from(center_point_pos.x - 300, center_point_pos.y + 260 - 12, 200, 24)))
             {
+                if (remaining_second > 0 && remaining_second < 15)
+                {
+                    extra_time_added += 15;
+                };
                 current_price += 300;
                 send_message_to(to_string(current_price), server_conn);
             };
 
-            rectangle rect = rectangle_from(500.0, 550.0, 200.0, 30.0);
-            draw_rectangle(COLOR_BLACK, rect);
-            if (button("Add customized amount", rectangle_from(center_point_pos.x + 100, center_point_pos.y + 200 - 12, 200, 24)))
+            if (mouse_clicked(LEFT_BUTTON) && point_in_rectangle(mouse_position(), input_rect) && !reading_text())
             {
-                start_reading_text(rect);
-                is_entering_name = true;
+                start_reading_text(input_rect);
             }
 
-            if (is_entering_name)
+            if (mouse_clicked(LEFT_BUTTON) && point_in_rectangle(mouse_position(), button_rect))
             {
                 if (reading_text())
                 {
-                    draw_collected_text(COLOR_BLACK, font_named("input"), 18, option_defaults());
-                }
-                else
-                {
                     if (text_entry_cancelled())
+                    {
                         name = "unknown";
+                    }
                     else
                     {
                         name = text_input();
-
-                        if (is_integer(name))
-                        {
-                            current_price += to_integer(name);
-                        }
                     }
-                    is_entering_name = false;
+                    if (is_integer(name))
+                    {
+                        if (remaining_second > 0 && remaining_second < 15)
+                        {
+                            extra_time_added += 15;
+                        };
+                        current_price += to_integer(name);
+                        send_message_to(to_string(current_price), server_conn);
+                    }
                 }
+                display_name = name;
             }
+
+            draw_rectangle(COLOR_BLACK, input_rect);
+            if (reading_text())
+            {
+                draw_collected_text(COLOR_BLACK, font_named("input"), 18, option_defaults());
+            }
+            else
+            {
+                draw_text(name, COLOR_BLACK, font_named("input"), 18, input_rect.x + 5, input_rect.y + 5);
+            }
+
+            draw_rectangle(COLOR_GRAY, button_rect);
+            draw_text("Submit", COLOR_BLACK, font_named("input"), 18, button_rect.x + 15, button_rect.y + 10);
+            // draw_text(display_name, COLOR_BLACK, font_named("input"), 18, 10, 10);
         }
         else if (current_screen == USER_PAGE)
         {
@@ -463,7 +511,7 @@ int main()
         }
         draw_interface();
         refresh_screen();
-    }
+    };
     stop_timer(minute_countdown);
     free_all_timers();
     close_all_windows();
