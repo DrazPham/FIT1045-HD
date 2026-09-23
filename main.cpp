@@ -12,7 +12,9 @@ enum GameScreen
     WAITING_PAGE,
     HOUSE_MORE_INFORMATION,
     USER_PAGE,
-    ADMIN_PAGE
+    ADMIN_PAGE,
+    USER_PURCHASE_FINAL,
+    USER_FAIL
 };
 GameScreen current_screen = MAIN_MENU;
 
@@ -61,7 +63,7 @@ int main()
     dynamic_array<house_detail> house_list_more;
     const int total_house_const = 12;
     connection server_conn = open_connection("client1", "127.0.0.1", 6000);
-    open_window("My Interface!", 800, 600);
+    window main_win = open_window("HOUSEMATCH", 1280, 720);
     timer minute_countdown = create_timer("1 Minute");
     unsigned long current_time = 0;
     if (!is_connection_open(server_conn))
@@ -477,6 +479,12 @@ int main()
         }
         else if (current_screen == HOUSE_MORE_INFORMATION)
         {
+            if (!has_window("HOUSE INFORMATION"))
+            {
+                open_window("HOUSE INFORMATION", 700, 500);
+            }
+            window info_win = window_named("HOUSE INFORMATION");
+
             string detail_house_txt = "This " + house_list_detail[current_house].house_type + " home in " +
                                       house_list_detail[current_house].location + " features " +
                                       to_string(house_list_detail[current_house].bedrooms) + " spacious bedrooms and " +
@@ -487,12 +495,23 @@ int main()
                                       to_lowercase(house_list_detail[current_house].condition) + ", this " +
                                       house_list_detail[current_house].orientation + "-facing property comes with " +
                                       to_string(house_list_detail[current_house].garage_spaces) + "-car garage space.";
-            draw_bitmap(bitmap_list[current_house], center_point_pos.x - bmp_width / 2, (center_point_pos.y - bmp_height / 2) - 80, opt);
-            draw_text(detail_house_txt, COLOR_BLACK, font_named("input"), 20, header_pos.x, header_pos.y + 200);
-            if (button("BACK TO CHOOSING", rectangle_from(start_btn_pos.x - 100, start_btn_pos.y - 12, 200, 24)))
+
+            set_current_window(info_win);
+            clear_screen(COLOR_WHITE);
+            paragraph(detail_house_txt);
+            draw_bitmap_on_window(info_win, bitmap_list[current_house], 80, 50, opt);
+
+            bool back_clicked = button("BACK TO CHOOSING", rectangle_from(250, 450, 200, 24));
+            draw_interface();
+            refresh_screen();
+
+            if (back_clicked || window_close_requested(info_win))
             {
+                close_window(info_win);
                 current_screen = HOUSE_SELECTION;
-            };
+            }
+
+            set_current_window(main_win);
         }
         else if (current_screen == ADMIN_PAGE)
         {
@@ -508,6 +527,24 @@ int main()
             //
             draw_text(HOUSE_REMAINING, COLOR_BLACK, font_named("input"), 20, header_pos.x, header_pos.y + 90);
             draw_text(to_string(total_house_const - total_house), COLOR_BLACK, font_named("input"), 20, header_pos.x + 250, header_pos.y + 120);
+        }
+        else if (current_screen == USER_PURCHASE_FINAL)
+        {
+            clear_screen(COLOR_WHITE);
+            draw_text("WAITING FOR OWNER CONFIRMATION", COLOR_BLACK, font_named("input"), 20, center_point_pos.x - 100, center_point_pos.y);
+            if (button("Back to user page", rectangle_from(center_point_pos.x - 100, center_point_pos.y + 50, 200, 24)))
+            {
+                current_screen = USER_PAGE;
+            };
+        }
+        else if (current_screen == USER_FAIL)
+        {
+            clear_screen(COLOR_WHITE);
+            draw_text("THANK YOU FOR TRYING", COLOR_BLACK, font_named("input"), 20, center_point_pos.x - 100, center_point_pos.y);
+            if (button("Back to user page", rectangle_from(center_point_pos.x - 100, center_point_pos.y + 50, 200, 24)))
+            {
+                current_screen = USER_PAGE;
+            };
         }
         draw_interface();
         refresh_screen();

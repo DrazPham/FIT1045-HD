@@ -1,24 +1,23 @@
 /////////////////////////////ORGANIZED CODE BEFORE TRYING ADVANCED FEATURE"
-3, move to confirm page 
-2, FILTER search (price, location,number of rooms, ..)
-6, ALL USERS INSIDE WAITING ROOM UNTIL OWNER CLICK OK => MOVE TO THE AUCTION PAGE => COUNTDOWN 30s before starting 
+2, FILTER search (price, location,number of rooms, ..) /// UPDATE MORE CHOICE, MORE OPTIMIZED
+6, ALL USERS INSIDE WAITING ROOM UNTIL OWNER CLICK OK => MOVE TO THE AUCTION PAGE => COUNTDOWN 30s before starting /// AUTH USER + ADMIN  
 
 
 //MAYBE CAN DO 
-4, limit trials => 3-5 turns per hours
-7, IN AUCTION DISPLAY NUMBER OF WAITING PEOPLE, MAYBE NEXT CALENDAR
-3, THE AUCTION PAGE FOR MORE PEOPLE still have problem synchronizing
-1, NOTIFY REAL TIME IF THERE IS ANOTHER ONE CHOOSE
+4, limit trials => 3-5 turns per hours // how to store? SERVER?
+7, IN AUCTION DISPLAY NUMBER OF WAITING PEOPLE, MAYBE NEXT CALENDAR //// number of people waiting store in server ??
+3, THE AUCTION PAGE FOR MORE PEOPLE still have problem synchronizing // need to test more
+1, NOTIFY REAL TIME IF THERE IS ANOTHER ONE CHOOSE // CONNECT TO LOCAL DEVICE ???
 
 
 //UNNECESSARY
-3. sealed bid => user just type their owned budget dont know other
+3. sealed bid => user just type their owned budget dont know other //DIVIDE INTO 2 SMALL SERVER??
 5, RANDOM FEATURE: PRICE DOWN, HIDE SOME INFORMATION 
 3, favorite set
 0, "LEADERBOARD" (LAST )
 1, DARK MODE
 5. HOUSE RATING + REVIEWING + NOTE + STATE (AVALABLE, SOLD,... IN AUCTION,..)
-2, OWNER SATISFIED PRICE??? => HOSUE HISTORY
+2, OWNER SATISFIED PRICE??? => HOUSE HISTORY
 
 //HARD TO IMPOSSIBLE
 4, swipe animation
