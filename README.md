@@ -22,3 +22,8 @@ Currently a work in progress. Planned features include:
 Networking approach is still being finalized — exploring options for handling concurrent connections and real-time state sync in C++.
 
 Feedback, ideas, and contributions are welcome!
+
+PLEASE RUN:
+
+- "make dev" in terminal to create client app
+- "make server" in terminal to create server app
