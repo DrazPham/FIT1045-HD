@@ -1,0 +1,4 @@
+1|draz|House A|650000
+2|bao|Glen Waverley Townhouse|720000
+3|ddraz|House A|650000
+4|bfao|Glen Waverley Townhouse|2340000

@@ -1,0 +1,12 @@
+1|admin|House A - Clayton|650000
+2|admin|House B - Glen Waverley|720000
+3|admin|House C - Box Hill|800000
+4|admin|House D - Springvale|540000
+5|admin|House E - Doncaster|910000
+6|admin|House F - Mulgrave|675000
+7|draz|House G - Camberwell|1050000
+8|admin|House H - Noble Park|485000
+9|bao|House I - Blackburn|830000
+10|admin|House J - Burwood|760000
+11|admin|House K - Balwyn|995000
+12|draz|House L - Oakleigh|620000

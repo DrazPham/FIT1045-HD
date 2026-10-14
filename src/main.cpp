@@ -63,6 +63,7 @@ int main()
     dynamic_array<house_detail> house_list_more;
     const int total_house_const = 12;
     connection server_conn = open_connection("client1", "127.0.0.1", 6000);
+    connection timercountdownserver = open_connection("client1", "127.0.0.1", 6123);
     window main_win = open_window("HOUSEMATCH", 1280, 720);
     timer minute_countdown = create_timer("1 Minute");
     unsigned long current_time = 0;
@@ -228,6 +229,7 @@ int main()
             if (button("Yes", rectangle_from(center_point_pos.x - 300, center_point_pos.y + 200 - 12, 200, 24)))
             // if (button("Yes", rectangle_from(start_btn_pos.x, start_btn_pos.y, 200, 24)))
             {
+                send_message_to("GET_HOUSES", server_conn);
                 send_message_to("ITEM:" + to_string(current_house), server_conn);
                 current_screen = WAITING_PAGE;
                 continue;
@@ -337,7 +339,7 @@ int main()
             double filled_width = bar_width * progress_ratio;
             fill_rectangle(COLOR_GREEN, rectangle_from(bar_x, bar_y, filled_width, bar_height));
 
-            send_message_to("TIME:" + to_string(remaining_second), server_conn);
+            send_message_to("TIME:" + to_string(remaining_second), timercountdownserver);
             draw_text("Remaining time:" + time_left, COLOR_BLACK, font_named("input"), 20, header_pos.x + 200, header_pos.y);
             draw_text("$" + to_string(current_price), COLOR_BLACK, font_named("input"), 20, house_price_pos.x, house_price_pos.y);
 
